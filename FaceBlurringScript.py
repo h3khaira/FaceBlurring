@@ -3,24 +3,35 @@ import numpy as np
 import sys
 from random import randint
 
-def fkface(face):
-    print("method")
-    cv2.imshow('inside', face)
+def expand(face):
     rows, columns, channels = face.shape
-    flipface = cv2.flip(face,-1)
+    for row in range(0,rows):
+        for col in range(0,columns):
+            face[row,col] = face[0,0]
 
-    #go thru pixels
-    for row in range(0,rows-1):
-        for col in range(0,columns-1):
-            if (col % 2):
-                face[row, col] = face[(rows-row)-1, col]
-            else:
-                face[row, col] = flipface[row, col]
-            
-    cv2.imshow('switch', face)
+def pixelface(face, bluramount):
+    rows, columns, channels = face.shape
+    #fill
+    if (rows <= bluramount or columns <= bluramount):
+        expand(face)
+        return
+    
+    #divide into 4 pieces
+    facepart = []
+    for j in range(0,2):
+        for i in range(0,2):
+            facepart.append(face[i*(rows/2) : (i+1)*(rows/2), j*(columns/2) : (j+1)*(columns/2)])
+            # print(len(facepart))
+            # print("part " + str(i*(rows/2)) + " to " + str((i+1)*(rows/2)))
+            # print("part " + str(j*(columns/2)) + " to " + str((j+1)*(columns/2)) + "\n")
 
-filenum=randint(100,450)
-#imname='image_0'+str(filenum)+'.jpg'
+    #recursive pieces
+    for i in range(0,4):
+        pixelface(facepart[i], bluramount)
+
+
+
+
 imname=sys.argv[1]
 colorim=cv2.imread(imname,1)
 raw_image=cv2.imread(imname,1) #loads a random grayscale image from directory
@@ -36,7 +47,9 @@ crop_image=[[]]
 for (x,y,w,h) in faces: #faces is a list containing bounding box coordinates and dimensions
     crop_image.append(raw_image[y:y+h,x:x+w])
     #cv2.imshow('Cropped '+str(i),crop_image[i])
-    fkface(crop_image[i])
+    #fkface(crop_image[i])
+    pixelface(crop_image[i], 0.08*(crop_image[i].shape[0]))
+    cv2.imshow('outside', crop_image[i])
     i=i+1
     cv2.rectangle(raw_image,(x,y),(x+w,y+h),(255,0,0),2)
   
