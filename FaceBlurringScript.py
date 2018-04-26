@@ -5,15 +5,16 @@ from random import randint
 imname='Oscar.jpg'
 
 raw_image=cv2.imread(imname,1) #loads a random grayscale image from directory
-#greyscale=cv2.cvtColor(raw_image,cv2.COLOR_BGR2GRAY)
-#equalized=cv2.equalizeHist(greyscale)
+cv2.imshow ('Raw Image',raw_image)
+greyscale=cv2.cvtColor(raw_image,cv2.COLOR_BGR2GRAY)
+equalized=cv2.equalizeHist(greyscale)
 #Haar-cascade classifier for face, pre-built in OpenCV
 face_cascade=cv2.CascadeClassifier('C:\Users\harse\Desktop\Python Projects\opencv-3.4.1\data\haarcascades\haarcascade_frontalface_default.xml')
 faces=face_cascade.detectMultiScale(equalized,1.05,5,5) #outputs a list of rectangles of face bounding boxes
 i=1
 crop_image=[[]]
 boxnum=0
-blurringIndex=5
+blurringIndex=8
 for (x,y,w,h) in faces: #faces is a list containing bounding box coordinates and dimensions
     for col in range(faces[boxnum,0],faces[boxnum,0]+faces[boxnum,2],blurringIndex): #iterates through the bounding box 
         for row in range(faces[boxnum,1], faces[boxnum,1]+faces[boxnum,3],blurringIndex): 
