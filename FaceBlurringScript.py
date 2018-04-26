@@ -1,21 +1,23 @@
-def fkface(face):
-    print("method")
-    cv2.imshow('inside', face)
-    rows, columns, channels = face.shape
-
-    #go thru pixels
-    for row in range(0,(rows/2)-1):
-        for col in range(0,columns-1):
-            temp = face[row, col]
-            face[row, col] = face[(rows-row)-1, col]
-            face[(rows-row)-1, col] = temp
-            col += 1
-    cv2.imshow('switch', face)
-    
 import cv2
 import numpy as np 
 import sys
 from random import randint
+
+def fkface(face):
+    print("method")
+    cv2.imshow('inside', face)
+    rows, columns, channels = face.shape
+    flipface = cv2.flip(face,-1)
+
+    #go thru pixels
+    for row in range(0,rows-1):
+        for col in range(0,columns-1):
+            if (col % 2):
+                face[row, col] = face[(rows-row)-1, col]
+            else:
+                face[row, col] = flipface[row, col]
+            
+    cv2.imshow('switch', face)
 
 filenum=randint(100,450)
 #imname='image_0'+str(filenum)+'.jpg'
@@ -24,8 +26,10 @@ colorim=cv2.imread(imname,1)
 raw_image=cv2.imread(imname,1) #loads a random grayscale image from directory
 greyscale=cv2.cvtColor(raw_image,cv2.COLOR_BGR2GRAY)
 equalized=cv2.equalizeHist(greyscale)
+
 #Haar-cascade classifier for face, pre-built in OpenCV
 face_cascade=cv2.CascadeClassifier('D:\OpenCV\opencv\sources\data\haarcascades\haarcascade_frontalface_default.xml')
+#face_cascade=cv2.CascadeClassifier('C:\Users\harse\Desktop\Python Projects\opencv-3.4.1\data\haarcascades\haarcascade_frontalface_default.xml')
 faces=face_cascade.detectMultiScale(equalized,1.05,5,5) #outputs a list of rectangles of face bounding boxes
 i=1
 crop_image=[[]]
