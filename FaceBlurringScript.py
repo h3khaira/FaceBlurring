@@ -1,6 +1,6 @@
 import cv2
 import numpy as np 
-import sys
+import sys, math
 from random import randint
 
 def expand(face):
@@ -20,7 +20,13 @@ def pixelface(face, bluramount):
     facepart = []
     for j in range(0,2):
         for i in range(0,2):
-            facepart.append(face[i*(rows/2) : (i+1)*(rows/2), j*(columns/2) : (j+1)*(columns/2)])
+            #coordinates
+            xstart  = int(math.floor(i * (rows/2)))
+            xend    = int(math.ceil((i+1)*(rows/2)))
+            ystart  = int(math.floor(j*(columns/2)))
+            yend    = int(math.ceil((j+1)*(columns/2)))
+
+            facepart.append(face[xstart:xend, ystart:yend])
             # print(len(facepart))
             # print("part " + str(i*(rows/2)) + " to " + str((i+1)*(rows/2)))
             # print("part " + str(j*(columns/2)) + " to " + str((j+1)*(columns/2)) + "\n")
@@ -28,8 +34,6 @@ def pixelface(face, bluramount):
     #recursive pieces
     for i in range(0,4):
         pixelface(facepart[i], bluramount)
-
-
 
 
 imname=sys.argv[1]
@@ -46,16 +50,12 @@ i=1
 crop_image=[[]]
 for (x,y,w,h) in faces: #faces is a list containing bounding box coordinates and dimensions
     crop_image.append(raw_image[y:y+h,x:x+w])
-    #cv2.imshow('Cropped '+str(i),crop_image[i])
-    #fkface(crop_image[i])
-    pixelface(crop_image[i], 0.08*(crop_image[i].shape[0]))
-    cv2.imshow('outside', crop_image[i])
+
+    #blur face
+    pixelface(crop_image[i], int(0.08*(crop_image[i].shape[0])))
+
     i=i+1
     cv2.rectangle(raw_image,(x,y),(x+w,y+h),(255,0,0),2)
-  
-#for boxnum in range(0,len(faces),1):
-    #for j in range(faces[boxnum,0],faces[boxnum,0]+faces[boxnum,2],1): #iterating through the bounding box 
-        #for i in range(faces[boxnum,1], faces[boxnum,1]+faces[boxnum,3],1):
 
 
 cv2.imshow('Face Detected', raw_image)
